@@ -1,0 +1,16 @@
+[
+  {
+    "name": "next-build",
+    "duration": 7781966,
+    "timestamp": 280007669415,
+    "id": 1,
+    "tags": {
+      "buildMode": "default",
+      "version": "16.2.4",
+      "bundler": "turbopack",
+      "failed": true
+    },
+    "startTime": 1777148817801,
+    "traceId": "b7bf407a86ca62fc"
+  }
+]

@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Opcional: Garante que o fundo e o texto mudem suavemente */
+:root {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+html {
+  scroll-behavior: smooth;
+}
+section {
+  scroll-margin-top: 13dvh;
+}
+.enabled {
+  z-index: 9999 !important;
+}
+/* Garante que o container do VLibras seja visível */
+.enabled.vw-plugin-top-wrapper {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 999999 !important;
+}
+
+/* Força o botão de acesso a aparecer no canto direito */
+[vw-access-button] {
+  display: block !important;
+  position: fixed !important;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999999;
+}
+/* Força o botão lateral a aparecer */
+.vw-plugin-top-wrapper, 
+[vw-access-button], 
+.access-button {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 999999 !important;
+}
+
+/* Garante que o bonequinho (widget aberto) fique na frente de tudo */
+.vp-container {
+  z-index: 999999 !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Se você usa Tailwind, às vezes o 'antialiased' no body mexe com fontes do widget. 
+   Isso garante que o container do player tenha tamanho */
+div[vw] {
+  position: fixed;
+  z-index: 999999;
+}
+
+
+
+/* =========================================
+   CLASSES DE ACESSIBILIDADE ATIVADAS VIA JS
+   ========================================= */
+
+/* Alto Contraste */
+.a11y-alto-contraste {
+  filter: contrast(120%) saturate(150%);
+  background-color: #000 !important;
+}
+.a11y-alto-contraste *:not(img) {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+/* Espaçamento de Texto (Dislexia) */
+.a11y-espacamento * {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+  line-height: 1.6 !important;
+}
+
+/* Fonte Legível (Fontes sem serifa padrão) */
+.a11y-fonte-legivel * {
+  font-family: 'Comic Sans MS', 'OpenDyslexic', Arial, sans-serif !important;
+}
+
+/* Parar Animações (TDAH / Sensibilidade a movimento) */
+.a11y-parar-animacoes * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Destacar Links */
+.a11y-destacar-links a, 
+.a11y-destacar-links button {
+  text-decoration: underline !important;
+  text-decoration-color: #F91818 !important;
+  text-decoration-thickness: 3px !important;
+  outline: 2px solid #F91818 !important;
+  outline-offset: 2px;
+}
+
+/* Cursor Gigante */
+.a11y-cursor-gigante * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2"><path d="M4 2l6 18 3.5-6.5L20 10 4 2z"/></svg>'), auto !important;
+}
+
+/* Daltonismo (Usando aproximações de filtros CSS) */
+html[data-daltonismo="tritanopia"] { filter: sepia(100%) hue-rotate(180deg) saturate(200%); }
+html[data-daltonismo="protanopia"] { filter: grayscale(100%) sepia(50%) hue-rotate(300deg); }
+html[data-daltonismo="deuteranopia"] { filter: grayscale(100%) sepia(50%) hue-rotate(200deg); }
