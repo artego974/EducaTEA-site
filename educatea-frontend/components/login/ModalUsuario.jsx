@@ -56,7 +56,7 @@ function InputField({ label, placeholder, type = "text", value, onChange, error,
 }
 
 // ─── Componente principal ────────────────────────────────────────────────────
-export default function ModalUsuario({ isOpen, onClose }) {
+export default function ModalUsuario({ isOpen, onClose, switchUser = null }) {
   const [view, setView] = useState("selection");
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedAvatar, setSelectedAvatar] = useState("avatar01.png");
@@ -202,6 +202,27 @@ export default function ModalUsuario({ isOpen, onClose }) {
             <h2 className="text-[24px] font-bold text-center border-b border-gray-100 py-5 px-6">
               {t('components.user_modal.selection.title')}
             </h2>
+
+            {/* Banner do usuário atual (modo trocar conta) */}
+            {switchUser && (
+              <div className="mx-6 mt-5 flex justify-center">
+                <div className="flex items-center gap-3 p-4 w-full rounded-2xl bg-gray-50 border border-gray-300 cursor-pointer hover:bg-gray-100 transition-colors" onClick={onClose}>
+                  <img
+                    src={`/images/avatars/${switchUser.profilePicture || "avatar01.png"}`}
+                    alt={switchUser.name}
+                    className="w-12 h-12 rounded-full object-cover shrink-0"
+                  />
+                  <div className="flex flex-col">
+                    <p className="font-bold text-sm text-gray-900 leading-tight">{switchUser.name}</p>
+                    <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                      Logado
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="p-6 flex flex-col gap-4">
               <button
                 onClick={() => setView("register")}
@@ -288,7 +309,7 @@ export default function ModalUsuario({ isOpen, onClose }) {
               <h2 className="text-[24px] font-bold">
                 {t('components.user_modal.register_step1.title')}
               </h2>
-              <span className="text-sm text-gray-400 font-medium">1 / 2</span>
+              <span className="text-sm text-[#1A3879] font-semibold mr-8">1 / 2</span>
             </div>
             <div className="p-6 flex flex-col gap-4">
               <InputField
@@ -360,7 +381,7 @@ export default function ModalUsuario({ isOpen, onClose }) {
               <h2 className="text-[24px] font-bold">
                 {t('components.user_modal.register_step2.title')}
               </h2>
-              <span className="text-sm text-gray-400 font-medium">2 / 2</span>
+              <span className="text-sm text-[#1A3879] font-semibold mr-8">2 / 2</span>
             </div>
             <div className="p-6 flex flex-col gap-5">
               {/* Avatar */}

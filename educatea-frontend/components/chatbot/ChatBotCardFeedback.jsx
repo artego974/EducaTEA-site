@@ -33,7 +33,7 @@ const ChatBotCardFeedback = ({ onClose, sessionId }) => {
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white rounded-4xl p-7 shadow-2xl border border-blue-50 w-[400px] relative overflow-hidden"
+      className="bg-white rounded-3xl sm:rounded-4xl p-5 sm:p-7 shadow-2xl border border-blue-50 w-[calc(100vw-3rem)] max-w-100 sm:w-100 relative overflow-hidden"
     >
       <AnimatePresence mode="wait">
         {!voted ? (

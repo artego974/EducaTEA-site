@@ -17,10 +17,9 @@ const initialState = {
   leitorTexto: false,
   idioma: null, 
   mascaraLeitura: false, 
-  lupa: false, 
-  guiaLeitura: false, // <-- ADICIONA ESTA LINHA
-  tecladoVirtual: false, // <-- ADICIONE ESTA LINHA
-
+  lupa: false,
+  guiaLeitura: false,
+  tecladoVirtual: false,
 };
 
 
@@ -39,17 +38,14 @@ export function AcessibilidadeProvider({ children }) {
   };
 
   useEffect(() => {
-  const html = document.documentElement;
+    const html = document.documentElement;
 
-  if (settings.modoEscuro) {
-    html.classList.add('dark');
-  } else {
-    html.classList.remove('dark');
-  }
-  
-  // LOG PARA DEBUG: Abra o console (F12) e veja se isso aparece ao clicar
-  console.log("Modo Escuro Ativo:", html.classList.contains('dark'));
-}, [settings.modoEscuro]);
+    if (settings.modoEscuro) {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
+  }, [settings.modoEscuro]);
 
   // Efeito principal: Adiciona as classes CSS na tag <html> do site
   useEffect(() => {
@@ -71,10 +67,7 @@ export function AcessibilidadeProvider({ children }) {
 
   }, [settings]);
 
-  // Efeito para o Leitor de Texto (Web Speech API)
   useEffect(() => {
-
-    
     const handleMouseUp = () => {
       if (!settings.leitorTexto) return;
       const textoSelecionado = window.getSelection().toString();
@@ -96,7 +89,6 @@ export function AcessibilidadeProvider({ children }) {
     updateSettings({ ...settings, [key]: !settings[key] });
   };
 
-  // <-- ADICIONE ESTA NOVA FUNÇÃO -->
   const setSetting = (key, value) => {
     updateSettings({ ...settings, [key]: value });
   };

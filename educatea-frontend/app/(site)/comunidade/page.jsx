@@ -6,15 +6,26 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
 import {
-  Heart, MessageCircle, Search, X, Send,
+  MessageCircle, Search, X,
   TrendingUp, Clock, MapPin, GraduationCap,
-  SlidersHorizontal, Feather, Users,
+  SlidersHorizontal, Feather, Users, Bookmark,
+  ThumbsUp, Share2,
 } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-function timeAgo(dateStr) {
-  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+function useNow() {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
+function timeAgo(dateStr, now = Date.now()) {
+  const diff = Math.floor((now - new Date(dateStr)) / 1000);
+  if (diff < 0) return "agora";
   if (diff < 60) return `${diff}s`;
   if (diff < 3600) return `${Math.floor(diff / 60)}min`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
@@ -26,8 +37,10 @@ function timeAgo(dateStr) {
 // Post Card (X-style)
 // ─────────────────────────────────────────
 function PostCard({ post, onReplyClick, currentUser, getToken, showToast }) {
+  const now = useNow();
   const [likes, setLikes] = useState(post.likesCount || 0);
   const [liked, setLiked] = useState(post.likedByMe || false);
+  const [saved, setSaved] = useState(post.savedByMe || false);
 
   const handleLike = async (e) => {
     e.stopPropagation();
@@ -49,75 +62,105 @@ function PostCard({ post, onReplyClick, currentUser, getToken, showToast }) {
     }
   };
 
+  const handleSave = async (e) => {
+    e.stopPropagation();
+    if (!currentUser) { showToast("Faça login para salvar posts.", "warning"); return; }
+    setSaved((v) => !v);
+    const res = await fetch(`${API}/api/comments/${post.id}/save`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setSaved(data.saved);
+      showToast(data.saved ? "Post salvo!" : "Post removido dos salvos.", "success");
+    } else {
+      setSaved((v) => !v);
+    }
+  };
+
   const handleReply = (e) => {
     e.stopPropagation();
     onReplyClick(post);
   };
 
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    try {
+      const url = typeof window !== "undefined" ? `${window.location.origin}/comunidade` : "/comunidade";
+      await navigator.clipboard.writeText(url);
+      showToast("Link copiado!", "success");
+    } catch {
+      showToast("Não foi possível copiar.", "error");
+    }
+  };
+
   return (
     <article
       onClick={() => onReplyClick(post)}
-      className="flex gap-3 px-4 py-4 border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+      className="border-2 border-[#0033FF] rounded-xl mx-4 my-3 p-3 py-6 flex items-center gap-3 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-950 dark:text-white transition-colors"
     >
-      {/* Avatar */}
       <img
         src={`/images/avatars/${post.imageUrl || "avatar01.png"}`}
         alt={post.author}
-        className="w-10 h-10 rounded-full object-cover flex-shrink-0 ring-2 ring-white dark:ring-zinc-900"
+        className="w-14 h-14 rounded-full object-cover flex-shrink-0"
       />
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        {/* Author + time */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="font-bold text-[15px] text-gray-900 dark:text-white leading-tight">
-            {post.author}
-          </span>
-          <span className="text-[13px] text-gray-400 leading-tight">· {timeAgo(post.createdAt)}</span>
-        </div>
-
-        {/* Text */}
-        <p className="text-[15px] text-gray-800 dark:text-gray-200 mt-1 leading-relaxed whitespace-pre-wrap break-words">
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+        <p className="text-[13px] leading-snug text-gray-800 dark:text-gray-100 line-clamp-3 whitespace-pre-wrap break-words">
           {post.text}
         </p>
 
-        {/* Post image */}
         {post.postImageUrl && (
           <img
             src={post.postImageUrl.startsWith("/") ? post.postImageUrl : `/images/uploads/${post.postImageUrl}`}
             alt="Imagem do post"
-            className="mt-3 rounded-2xl w-full max-h-72 object-cover border border-gray-100 dark:border-zinc-700"
+            className="rounded-md w-full max-h-44 object-cover"
             onClick={(e) => e.stopPropagation()}
           />
         )}
 
-        {/* Actions */}
-        <div className="flex gap-1 mt-3 -ml-2">
-          {/* Like */}
-          <button
-            onClick={handleLike}
-            className={`flex items-center gap-1 text-[13px] font-medium px-2 py-1.5 rounded-full transition-colors group ${
-              liked
-                ? "text-red-500"
-                : "text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-            }`}
-          >
-            <Heart
-              className="w-[18px] h-[18px] transition-transform group-hover:scale-110"
-              fill={liked ? "currentColor" : "none"}
-              strokeWidth={liked ? 0 : 2}
-            />
-            {likes > 0 && <span>{likes}</span>}
-          </button>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate">
+            {post.author} · {timeAgo(post.createdAt, now)}
+          </span>
 
-          {/* Reply */}
-          <button
-            onClick={handleReply}
-            className="flex items-center gap-1 text-[13px] font-medium text-gray-400 hover:text-[#1A3879] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-2 py-1.5 rounded-full transition-colors group"
-          >
-            <MessageCircle className="w-[18px] h-[18px] transition-transform group-hover:scale-110" />
-            {post.replyCount > 0 && <span>{post.replyCount}</span>}
-          </button>
+          <div className="flex items-center gap-2.5 text-[11px] text-gray-500 dark:text-gray-400 flex-shrink-0">
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-0.5 transition-colors cursor-pointer ${
+                liked ? "text-red-500" : "hover:text-red-400"
+              }`}
+              title={liked ? "Descurtir" : "Curtir"}
+            >
+              <ThumbsUp className="w-3.5 h-3.5" fill={liked ? "currentColor" : "none"} />
+              {likes}
+            </button>
+            <button
+              onClick={handleReply}
+              className="flex items-center gap-0.5 hover:text-[#1A3879] dark:hover:text-blue-400 transition-colors cursor-pointer"
+              title="Comentar"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              {post.replyCount || 0}
+            </button>
+            <button
+              onClick={handleSave}
+              className={`flex items-center transition-colors cursor-pointer ${
+                saved ? "text-[#1A3879] dark:text-blue-400" : "hover:text-[#1A3879] dark:hover:text-blue-400"
+              }`}
+              title={saved ? "Remover dos salvos" : "Salvar post"}
+            >
+              <Bookmark className="w-3.5 h-3.5" fill={saved ? "currentColor" : "none"} />
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex items-center hover:text-[#1A3879] dark:hover:text-blue-400 transition-colors cursor-pointer"
+              title="Compartilhar"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </article>
@@ -128,13 +171,18 @@ function PostCard({ post, onReplyClick, currentUser, getToken, showToast }) {
 // Reply Modal (X-style thread)
 // ─────────────────────────────────────────
 function ReplyModal({ comment, onClose, currentUser, getToken, onReplyPosted }) {
+  const now = useNow();
   const [replies, setReplies] = useState([]);
   const [newReply, setNewReply] = useState("");
   const [posting, setPosting] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null); // { id, author } of the reply being responded to
   const inputRef = useRef(null);
+  const isPostAuthor = currentUser?.id === comment.userId;
 
   useEffect(() => {
-    fetch(`${API}/api/comments/${comment.id}/replies`)
+    fetch(`${API}/api/comments/${comment.id}/replies`, {
+      headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+    })
       .then((r) => r.json())
       .then((data) => setReplies(Array.isArray(data) ? data : []))
       .catch(() => {});
@@ -144,19 +192,26 @@ function ReplyModal({ comment, onClose, currentUser, getToken, onReplyPosted }) 
     if (currentUser) setTimeout(() => inputRef.current?.focus(), 300);
   }, [currentUser]);
 
+  const handleReplyToComment = (reply) => {
+    setReplyingTo({ id: reply.id, author: reply.author });
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
   const handlePost = async (e) => {
     e.preventDefault();
     if (!newReply.trim() || !currentUser) return;
     setPosting(true);
+    const parentId = replyingTo ? replyingTo.id : comment.id;
     const res = await fetch(`${API}/api/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-      body: JSON.stringify({ text: newReply, section: comment.section, parentId: comment.id }),
+      body: JSON.stringify({ text: newReply, section: comment.section, parentId }),
     });
     if (res.ok) {
       const created = await res.json();
       setReplies((p) => [...p, created]);
       setNewReply("");
+      setReplyingTo(null);
       onReplyPosted?.(comment.id);
     }
     setPosting(false);
@@ -200,7 +255,7 @@ function ReplyModal({ comment, onClose, currentUser, getToken, onReplyPosted }) 
           <div className="flex-1 pb-4 min-w-0">
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-[15px] dark:text-white">{comment.author}</span>
-              <span className="text-[13px] text-gray-400">· {timeAgo(comment.createdAt)}</span>
+              <span className="text-[13px] text-gray-400">· {timeAgo(comment.createdAt, now)}</span>
             </div>
             <p className="text-[15px] text-gray-800 dark:text-gray-200 mt-1 leading-relaxed whitespace-pre-wrap break-words">
               {comment.text}
@@ -233,11 +288,32 @@ function ReplyModal({ comment, onClose, currentUser, getToken, onReplyPosted }) 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[14px] dark:text-white">{r.author}</span>
-                    <span className="text-[12px] text-gray-400">· {timeAgo(r.createdAt)}</span>
+                    <span className="text-[12px] text-gray-400">· {timeAgo(r.createdAt, now)}</span>
                   </div>
                   <p className="text-[14px] text-gray-800 dark:text-gray-200 mt-0.5 leading-relaxed break-words">
                     {r.text}
                   </p>
+                  {/* Reply-to-comment button: only post author can respond */}
+                  <div className="mt-1.5">
+                    {isPostAuthor ? (
+                      <button
+                        onClick={() => handleReplyToComment(r)}
+                        className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-[#1A3879] dark:hover:text-blue-400 transition-colors"
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        Responder
+                      </button>
+                    ) : (
+                      <span className="relative group/tip flex items-center gap-1 text-[11px] text-gray-300 dark:text-zinc-600 cursor-not-allowed select-none w-fit">
+                        <MessageCircle className="w-3 h-3" />
+                        Responder
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-max max-w-[180px] rounded-lg bg-gray-800 dark:bg-zinc-700 text-white text-[11px] leading-snug px-2.5 py-1.5 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-150 whitespace-normal text-center shadow-lg z-10">
+                          Apenas o autor do post pode responder
+                          <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800 dark:border-t-zinc-700" />
+                        </span>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
@@ -248,33 +324,43 @@ function ReplyModal({ comment, onClose, currentUser, getToken, onReplyPosted }) 
         {currentUser ? (
           <form
             onSubmit={handlePost}
-            className="px-4 py-3 border-t dark:border-zinc-800 flex items-center gap-3"
+            className="px-4 py-3 border-t dark:border-zinc-800 flex flex-col gap-2"
           >
-            <img
-              src={`/images/avatars/${currentUser.profilePicture || "avatar01.png"}`}
-              className="w-9 h-9 rounded-full object-cover flex-shrink-0"
-            />
-            <input
-              ref={inputRef}
-              value={newReply}
-              onChange={(e) => setNewReply(e.target.value)}
-              placeholder="Poste sua resposta"
-              className="flex-1 bg-transparent dark:text-white text-[15px] outline-none placeholder:text-gray-400"
-            />
-            <button
-              type="submit"
-              disabled={posting || !newReply.trim()}
-              className="bg-[#1A3879] text-white text-sm font-bold px-4 py-1.5 rounded-full disabled:opacity-50 hover:bg-[#152d63] transition-colors cursor-pointer"
-            >
-              {posting ? "..." : "Responder"}
-            </button>
+            {replyingTo && (
+              <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-zinc-500 px-1">
+                <span>Respondendo a <span className="font-semibold text-[#1A3879] dark:text-blue-400">@{replyingTo.author}</span></span>
+                <button type="button" onClick={() => setReplyingTo(null)} className="hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
+                  <X size={12} />
+                </button>
+              </div>
+            )}
+            <div className="flex items-center gap-3">
+              <img
+                src={`/images/avatars/${currentUser.profilePicture || "avatar01.png"}`}
+                className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+              />
+              <input
+                ref={inputRef}
+                value={newReply}
+                onChange={(e) => setNewReply(e.target.value)}
+                placeholder={replyingTo ? `Respondendo a @${replyingTo.author}…` : "Comente neste post"}
+                className="flex-1 bg-transparent dark:text-white text-[15px] outline-none placeholder:text-gray-400"
+              />
+              <button
+                type="submit"
+                disabled={posting || !newReply.trim()}
+                className="bg-[#1A3879] text-white text-sm font-bold px-4 py-1.5 rounded-full disabled:opacity-50 hover:bg-[#152d63] transition-colors cursor-pointer"
+              >
+                {posting ? "..." : "Enviar"}
+              </button>
+            </div>
           </form>
         ) : (
           <div className="px-4 py-3 border-t dark:border-zinc-800 text-center text-sm text-gray-400">
             <span className="text-[#1A3879] dark:text-blue-400 font-semibold cursor-pointer">
               Faça login
             </span>{" "}
-            para responder.
+            para comentar.
           </div>
         )}
       </motion.div>
@@ -370,7 +456,9 @@ export default function Comunidade() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API}/api/comments?section=comunidade`)
+    fetch(`${API}/api/comments?section=comunidade`, {
+      headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+    })
       .then((r) => r.json())
       .then((data) => setComments(Array.isArray(data) ? data : []))
       .catch(() => setComments([]))
@@ -471,7 +559,7 @@ export default function Comunidade() {
                 <button
                   key={id}
                   onClick={() => setActiveFilter(id)}
-                  className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors flex-shrink-0 ${
+                  className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors flex-shrink-0 cursor-pointer ${
                     activeFilter === id
                       ? "text-gray-900 dark:text-white"
                       : "text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800/60"
@@ -596,23 +684,32 @@ export default function Comunidade() {
             </div>
           )}
 
-          {/* Meus posts shortcut (logged in) */}
+          {/* Meus posts + salvos (logged in) */}
           {user && (
-            <button
-              onClick={() => router.push("/meus-posts")}
-              className="w-full text-left bg-gray-50 dark:bg-zinc-800 rounded-2xl p-5 hover:bg-gray-100 dark:hover:bg-zinc-700/60 transition-colors"
-            >
+            <div className="bg-gray-50 dark:bg-zinc-800 rounded-2xl p-5 flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <img
                   src={`/images/avatars/${user.profilePicture || "avatar01.png"}`}
                   className="w-9 h-9 rounded-full object-cover"
                 />
-                <div>
-                  <p className="text-sm font-bold dark:text-white">{user.name}</p>
-                  <p className="text-xs text-[#1A3879] dark:text-blue-400 font-medium">Ver meus posts →</p>
-                </div>
+                <p className="text-sm font-bold dark:text-white">{user.name}</p>
               </div>
-            </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => router.push("/meus-posts")}
+                  className="w-full text-left text-xs text-[#1A3879] dark:text-blue-400 font-medium hover:underline cursor-pointer"
+                >
+                  Ver meus posts →
+                </button>
+                <button
+                  onClick={() => router.push("/meus-salvos")}
+                  className="w-full text-left flex items-center gap-1 text-xs text-[#1A3879] dark:text-blue-400 font-medium hover:underline cursor-pointer"
+                >
+                  <Bookmark size={12} />
+                  Posts salvos →
+                </button>
+              </div>
+            </div>
           )}
         </aside>
       </div>

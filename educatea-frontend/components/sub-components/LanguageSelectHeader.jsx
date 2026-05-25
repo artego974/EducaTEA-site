@@ -9,19 +9,13 @@ import { useLanguage } from "@/context/LanguageContext"; // Ajuste o caminho con
 
 // Importação das Imagens (Mantida igual)
 import FlagBrasil from "../../public/images/languages/BR.webp"
-import FlagPortugal from "../../public/images/languages/Portugal.webp"
-import FlagAngola from "../../public/images/languages/Angola.webp"
 import FlagUS from "../../public/images/languages/US.webp"
 import FlagEspanha from "../../public/images/languages/ES.webp"
-import FlagLatAm from "../../public/images/languages/LatAm.webp"
 
 const languages = [
-  { id: "pt-br", label: "Português (Brasil)", flag: FlagBrasil },
-  // { id: "pt-pt", label: "Português (Portugal)", flag: FlagPortugal },
-  // { id: "pt-ag", label: "Português (Angola)", flag: FlagAngola },
+  { id: "pt-br", label: "Português (BR)", flag: FlagBrasil },
   { id: "en-us", label: "English (US)", flag: FlagUS },
-  { id: "es-es", label: "Español", flag: FlagEspanha },
-  // { id: "es-al", label: "Español (LatAm)", flag: FlagLatAm },
+  { id: "es-es", label: "Español (ES)", flag: FlagEspanha },
 ];
 
 export function LanguageSelectHeader() {

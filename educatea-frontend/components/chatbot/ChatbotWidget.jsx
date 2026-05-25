@@ -39,7 +39,7 @@ export default function ChatbotWidget() {
 
   return (
     <div className="flex flex-col items-end gap-4 w-72">
-      <div className="fixed bottom-25 right-6 z-50 flex flex-col items-end gap-3">
+      <div className="fixed bottom-22 right-4 sm:bottom-25 sm:right-6 z-50 flex flex-col items-end gap-3 max-w-[calc(100vw-2rem)] sm:max-w-none">
         <AnimatePresence>
           {open && <ChatbotCard onClose={handleCloseChat} sessionId={sessionId} />}
         </AnimatePresence>

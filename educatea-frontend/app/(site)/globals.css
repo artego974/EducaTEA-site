@@ -2,6 +2,75 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* =========================================
+   DESIGN TOKENS — Base para redesign futuro
+   Uso: bg-brand-500, text-accent-500, border-highlight-500,
+        bg-surface-900, text-success, var(--color-brand-500)
+   ========================================= */
+@theme {
+  /* ---------- BRAND — Azul institucional EducaTEA ---------- */
+  /* Base: #1A3879 (botão Jogar, headlines, links principais) */
+  --color-brand-50:  #EEF1F8;
+  --color-brand-100: #D8DFEE;
+  --color-brand-200: #B3C0DD;
+  --color-brand-300: #8D9DC3;
+  --color-brand-400: #4C68A0;
+  --color-brand-500: #1A3879;
+  --color-brand-600: #152D63;
+  --color-brand-700: #0F2350;
+  --color-brand-800: #0A1A3C;
+  --color-brand-900: #061128;
+  --color-brand-950: #030814;
+
+  /* ---------- ACCENT — Azul vivo de ação/foco/destaque ---------- */
+  /* Base: #0033FF (progress bar, focus, bordas de seleção, links inline) */
+  --color-accent-50:  #E6ECFF;
+  --color-accent-100: #C2CDFF;
+  --color-accent-200: #8AA1FF;
+  --color-accent-300: #5274FF;
+  --color-accent-400: #2A52FF;
+  --color-accent-500: #0033FF;
+  --color-accent-600: #002BD9;
+  --color-accent-700: #0023B3;
+  --color-accent-800: #001A82;
+  --color-accent-900: #001152;
+
+  /* ---------- HIGHLIGHT — CTA quente (laranja/amarelo) ---------- */
+  /* Base: #F9AD18 (botão Download, badge expandir slider) */
+  --color-highlight-50:  #FEF7E6;
+  --color-highlight-100: #FDEAB8;
+  --color-highlight-200: #FCDA85;
+  --color-highlight-300: #FBC852;
+  --color-highlight-400: #FAB52E;
+  --color-highlight-500: #F9AD18;
+  --color-highlight-600: #E69500;
+  --color-highlight-700: #B87600;
+  --color-highlight-800: #8A5800;
+  --color-highlight-900: #5C3B00;
+
+  /* ---------- SURFACE — Fundos escuros (seção do jogo, hero) ---------- */
+  /* Gradient atual: from-#0B1623 to-#050B14 */
+  --color-surface-700: #1F2B42;
+  --color-surface-800: #152033;
+  --color-surface-900: #0B1623;
+  --color-surface-950: #050B14;
+
+  /* ---------- STATUS — Cores semânticas ---------- */
+  --color-success: #2ECC71;
+  --color-warning: #FF7A00;
+  --color-danger:  #F91818;
+  --color-info:    #3498DB;
+
+  /* ---------- CHART — Paleta dos gráficos SUS ---------- */
+  --color-chart-blue:   #3498DB;
+  --color-chart-purple: #9B59B6;
+  --color-chart-green:  #2ECC71;
+  --color-chart-orange: #E67E22;
+  --color-chart-red:    #E74C3C;
+  --color-chart-yellow: #F1C40F;
+  --color-chart-teal:   #0AC5B2;
+}
+
 /* Opcional: Garante que o fundo e o texto mudem suavemente */
 :root {
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -68,13 +137,42 @@ div[vw] {
 
 /* Alto Contraste */
 .a11y-alto-contraste {
-  filter: contrast(120%) saturate(150%);
   background-color: #000 !important;
 }
-.a11y-alto-contraste *:not(img) {
+.a11y-alto-contraste *:not(img):not(.a11y-img) {
   background-color: #000 !important;
   color: #fff !important;
   border-color: #fff !important;
+}
+
+/* Containers sobre imagens que devem permanecer transparentes */
+.a11y-alto-contraste .a11y-no-bg {
+  background-color: transparent !important;
+}
+
+/* Bordas visíveis em alto contraste para botões e inputs sem borda */
+.a11y-alto-contraste button,
+.a11y-alto-contraste [role="button"],
+.a11y-alto-contraste input[type="button"],
+.a11y-alto-contraste input[type="submit"],
+.a11y-alto-contraste input[type="reset"],
+.a11y-alto-contraste input:not([type="hidden"]),
+.a11y-alto-contraste select,
+.a11y-alto-contraste textarea,
+.a11y-alto-contraste a {
+  border: 2px solid #fff !important;
+}
+
+/* Contorno visível em alto contraste para boxes e seções sem borda */
+.a11y-alto-contraste section,
+.a11y-alto-contraste article,
+.a11y-alto-contraste aside,
+.a11y-alto-contraste header,
+.a11y-alto-contraste footer,
+.a11y-alto-contraste nav,
+.a11y-alto-contraste main {
+  outline: 1px solid rgba(255, 255, 255, 0.4) !important;
+  outline-offset: -1px;
 }
 
 /* Espaçamento de Texto (Dislexia) */
@@ -110,7 +208,7 @@ div[vw] {
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="2"><path d="M4 2l6 18 3.5-6.5L20 10 4 2z"/></svg>'), auto !important;
 }
 
-/* Daltonismo (Usando aproximações de filtros CSS) */
-html[data-daltonismo="tritanopia"] { filter: sepia(100%) hue-rotate(180deg) saturate(200%); }
-html[data-daltonismo="protanopia"] { filter: grayscale(100%) sepia(50%) hue-rotate(300deg); }
-html[data-daltonismo="deuteranopia"] { filter: grayscale(100%) sepia(50%) hue-rotate(200deg); }
+/* Daltonismo — matrizes de cor baseadas em Brettel, Viénot & Mollon (1997) */
+html[data-daltonismo="protanopia"]   { filter: url('#daltonismo-protanopia'); }
+html[data-daltonismo="deuteranopia"] { filter: url('#daltonismo-deuteranopia'); }
+html[data-daltonismo="tritanopia"]   { filter: url('#daltonismo-tritanopia'); }

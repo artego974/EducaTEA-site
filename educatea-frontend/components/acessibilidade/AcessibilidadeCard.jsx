@@ -13,11 +13,8 @@ import Image from "next/image";
 // Importações de Imagens (Mantenha os caminhos do seu projeto)
 import TextLogo from "../../public/images/logos/TextLogo.webp";
 import FlagBrasil from "../../public/images/languages/BR.webp";
-import FlagPortugal from "../../public/images/languages/Portugal.webp";
-import FlagAngola from "../../public/images/languages/Angola.webp";
 import FlagUS from "../../public/images/languages/US.webp";
 import FlagEspanha from "../../public/images/languages/ES.webp";
-import FlagLatAm from "../../public/images/languages/LatAm.webp";
 
 // IMPORTANTE: Importando o Contexto de Acessibilidade
 import { useAcessibilidade } from "@/context/AcessibilidadeContext";
@@ -26,14 +23,14 @@ import { usePathname, useRouter } from "next/navigation";
 
 
 const languages = [
-  { id: "pt-br", label: "Português (Brasil)", flag: FlagBrasil },
+  { id: "pt-br", label: "Português (BR)", flag: FlagBrasil },
   { id: "en-us", label: "English (US)", flag: FlagUS },
-  { id: "es-es", label: "Español", flag: FlagEspanha },
+  { id: "es-es", label: "Español (ES)", flag: FlagEspanha },
 ];
 
 export default function AcessibilidadeCard({ onClose }) {
   const [langOpen, setLangOpen] = useState(false);
-  const { lang, switchLanguage } = useLanguage();
+  const { lang, switchLanguage, t } = useLanguage();
   const {
     settings,
     toggleSetting,
@@ -84,7 +81,7 @@ export default function AcessibilidadeCard({ onClose }) {
   return (
     <div
       className="
-        relative w-[450px] h-[75dvh] rounded-3xl py-4 px-3 flex flex-col text-white shadow-xl
+        relative w-[450px] max-w-[calc(100vw-3rem)] h-[75dvh] rounded-3xl py-4 px-3 flex flex-col text-white shadow-xl
         overflow-y-auto overflow-x-hidden
         bg-[#EAEAEA]
         z-0
@@ -102,27 +99,27 @@ export default function AcessibilidadeCard({ onClose }) {
       </div>
 
       <h2 className="text-center text-lg font-semibold my-5">
-        Painel de Acessibilidade
+        {t('components.accessibility_card.title')}
       </h2>
 
       {/* Ações Rápidas (Conectadas ao Contexto) */}
       <div className="flex gap-3 mb-4">
-        <ActionButton icon={<Undo2 size={16} />} label="Voltar" onClick={undo} disabled={!canUndo} />
-        <ActionButton icon={<Power size={16} />} label="Desligar" onClick={resetSettings} />
-        <ActionButton icon={<Redo2 size={16} />} label="Avançar" onClick={redo} disabled={!canRedo} />
+        <ActionButton icon={<Undo2 size={16} />} label={t('components.accessibility_card.undo_btn')} onClick={undo} disabled={!canUndo} />
+        <ActionButton icon={<Power size={16} />} label={t('components.accessibility_card.power_btn')} onClick={resetSettings} />
+        <ActionButton icon={<Redo2 size={16} />} label={t('components.accessibility_card.redo_btn')} onClick={redo} disabled={!canRedo} />
       </div>
 
       <div className="flex flex-col gap-4">
         {/* --- IDIOMA --- */}
-        <Section title="Idioma">
+        <Section title={t('components.accessibility_card.section_language')}>
           <p className="text-[10px] text-gray-400 mb-3 px-1 font-bold uppercase tracking-widest">
-            Selecione sua preferência
+            {t('components.accessibility_card.language_select')}
           </p>
 
           <div className="relative">
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="w-full flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100 hover:border-[#143A7B]/20 transition-all"
+              className="w-full flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100 hover:border-[#143A7B]/20 transition-all cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <Image
@@ -170,135 +167,156 @@ export default function AcessibilidadeCard({ onClose }) {
         </Section>
 
         {/* --- OPÇÕES GERAIS --- */}
-        <Section title="Opções Gerais">
+        <Section title={t('components.accessibility_card.section_general')}>
           <div className="grid grid-cols-3 gap-3">
             {/* Visuais */}
-            <Option icon={<Contrast />} label="Alto Contraste" active={settings.altoContraste} onClick={() => toggleSetting('altoContraste')} />
-            <Option 
-              icon={<Sun />} 
-              label="Modo Escuro" 
-              active={settings.modoEscuro} 
-              onClick={() => toggleSetting('modoEscuro')} 
+            <Option icon={<Contrast />} label={t('components.accessibility_card.high_contrast')} active={settings.altoContraste} onClick={() => toggleSetting('altoContraste')} t={t} />
+            <Option
+              icon={<Sun />}
+              label={t('components.accessibility_card.dark_mode')}
+              active={settings.modoEscuro}
+              onClick={() => toggleSetting('modoEscuro')}
+              t={t}
             />
-            <Option icon={<Baseline />} label="Espaçamento de Texto" active={settings.espacamentoTexto} onClick={() => toggleSetting('espacamentoTexto')} />
+            <Option icon={<Baseline />} label={t('components.accessibility_card.text_spacing')} active={settings.espacamentoTexto} onClick={() => toggleSetting('espacamentoTexto')} t={t} />
 
             {/* Foco e Leitura (Apenas UI por enquanto, adicione a lógica se desejar) */}
-            <Option 
-              icon={<MoveRight />} 
-              label="Guia de Leitura" 
-              active={settings.guiaLeitura} 
-              onClick={() => toggleSetting('guiaLeitura')} 
+            <Option
+              icon={<MoveRight />}
+              label={t('components.accessibility_card.reading_guide')}
+              active={settings.guiaLeitura}
+              onClick={() => toggleSetting('guiaLeitura')}
+              desktopOnly
+              t={t}
             />
-            <Option 
-              icon={<ScanLine />} 
-              label="Máscara de Leitura" 
-              active={settings.mascaraLeitura} 
-              onClick={() => toggleSetting('mascaraLeitura')} 
+            <Option
+              icon={<ScanLine />}
+              label={t('components.accessibility_card.reading_mask')}
+              active={settings.mascaraLeitura}
+              onClick={() => toggleSetting('mascaraLeitura')}
+              desktopOnly
+              t={t}
             />
-            <Option icon={<AlignLeft />} label="Texto Alinhado" />
+            {/* <Option icon={<AlignLeft />} label="Texto Alinhado" /> */}
 
             {/* Navegação e Movimento */}
-            <Option icon={<MousePointer2 />} label="Cursor Gigante" active={settings.cursorGigante} onClick={() => toggleSetting('cursorGigante')} />
-            <Option icon={<PauseCircleIcon />} label="Parar Animações" active={settings.pararAnimacoes} onClick={() => toggleSetting('pararAnimacoes')} />
-            <Option icon={<BookA />} label="Dicionário" />
+            <Option icon={<MousePointer2 />} label={t('components.accessibility_card.giant_cursor')} active={settings.cursorGigante} onClick={() => toggleSetting('cursorGigante')} desktopOnly t={t} />
+            {/* <Option icon={<PauseCircleIcon />} label="Parar Animações" active={settings.pararAnimacoes} onClick={() => toggleSetting('pararAnimacoes')} /> */}
+            {/* <Option icon={<BookA />} label="Dicionário" /> */}
 
             {/* Outros */}
-            <Option icon={<Volume2 />} label="Leitor de texto" active={settings.leitorTexto} onClick={() => toggleSetting('leitorTexto')} />
-            <Option 
-              icon={<Search />} 
-              label="Lupa" 
-              active={settings.lupa} 
-              onClick={() => toggleSetting('lupa')} 
+            <Option icon={<Volume2 />} label={t('components.accessibility_card.text_reader')} active={settings.leitorTexto} onClick={() => toggleSetting('leitorTexto')} t={t} />
+            <Option
+              icon={<Search />}
+              label={t('components.accessibility_card.magnifier')}
+              active={settings.lupa}
+              onClick={() => toggleSetting('lupa')}
+              desktopOnly
+              t={t}
             />
-            <Option icon={<Type />} label="Fonte Legível" active={settings.fonteLegivel} onClick={() => toggleSetting('fonteLegivel')} />
-            <Option icon={<Link2 />} label="Destacar Links" active={settings.destacarLinks} onClick={() => toggleSetting('destacarLinks')} />
-            <Option 
-              icon={<Keyboard />} 
-              label="Teclado de Navegação" 
-              active={settings.tecladoVirtual} 
-              onClick={() => toggleSetting('tecladoVirtual')} 
-            />            
+            <Option icon={<Type />} label={t('components.accessibility_card.readable_font')} active={settings.fonteLegivel} onClick={() => toggleSetting('fonteLegivel')} t={t} />
+            <Option icon={<Link2 />} label={t('components.accessibility_card.highlight_links')} active={settings.destacarLinks} onClick={() => toggleSetting('destacarLinks')} t={t} />
+            <Option
+              icon={<Keyboard />}
+              label={t('components.accessibility_card.keyboard_nav')}
+              active={settings.tecladoVirtual}
+              onClick={() => toggleSetting('tecladoVirtual')}
+              desktopOnly
+              t={t}
+            />
             {/* Lógica de Zoom */}
-            <Option 
-              icon={<ZoomIn />} 
-              label="Ampliador de Texto" 
-              active={settings.zoom > 1} 
-              onClick={() => { settings.zoom > 1.4 ? changeZoom(-1) : changeZoom(0.1) }} 
+            <Option
+              icon={<ZoomIn />}
+              label={t('components.accessibility_card.text_magnifier')}
+              active={settings.zoom > 1}
+              onClick={() => { settings.zoom > 1.4 ? changeZoom(-1) : changeZoom(0.1) }}
+              t={t}
             />
           </div>
         </Section>
 
         {/* --- DALTONISMO --- */}
-        <Section title="Daltonismo">
+        <Section title={t('components.accessibility_card.section_colorblind')}>
+          <p className="text-[10px] text-gray-400 mb-3 px-1 font-bold uppercase tracking-widest">
+            {t('components.accessibility_card.colorblind_select')}
+          </p>
           <div className="grid grid-cols-2 gap-3">
-            <ColorCard label="Sem daltonismo" gradient="from-indigo-500 via-green-400 to-red-500" active={settings.daltonismo === null} onClick={() => setDaltonismo(null)} />
-            <ColorCard label="Tritanopia" gradient="from-teal-500 to-red-500" active={settings.daltonismo === 'tritanopia'} onClick={() => setDaltonismo('tritanopia')} />
-            <ColorCard label="Protonopia" gradient="from-blue-700 to-yellow-400" active={settings.daltonismo === 'protanopia'} onClick={() => setDaltonismo('protanopia')} />
-            <ColorCard label="Deuteranopia" gradient="from-green-600 to-yellow-500" active={settings.daltonismo === 'deuteranopia'} onClick={() => setDaltonismo('deuteranopia')} />
+            <ColorCard label={t('components.accessibility_card.color_standard')} gradient="from-red-500 via-green-400 to-blue-500" active={settings.daltonismo === null} onClick={() => setDaltonismo(null)} />
+            <ColorCard label={t('components.accessibility_card.protanopia')} gradient="from-red-600 to-green-500" active={settings.daltonismo === 'protanopia'} onClick={() => setDaltonismo('protanopia')} />
+            <ColorCard label={t('components.accessibility_card.deuteranopia')} gradient="from-green-600 to-red-500" active={settings.daltonismo === 'deuteranopia'} onClick={() => setDaltonismo('deuteranopia')} />
+            <ColorCard label={t('components.accessibility_card.tritanopia')} gradient="from-blue-500 to-yellow-400" active={settings.daltonismo === 'tritanopia'} onClick={() => setDaltonismo('tritanopia')} />
           </div>
         </Section>
 
         {/* --- FÁCIL NAVEGAÇÃO --- */}
-        <Section title="Fácil Navegação">
+        <Section title={t('components.accessibility_card.section_navigation')}>
           <div className="grid grid-cols-2 gap-3">
-            <Option 
-              icon={<Home size={20} />} 
-              label="1. Inicial" 
-              onClick={() => handleNavigation('/')} 
-              active={pathname === '/'} 
+            <Option
+              icon={<Home size={20} />}
+              label={t('components.accessibility_card.nav_home')}
+              onClick={() => handleNavigation('/')}
+              active={pathname === '/'}
+              t={t}
             />
-            <Option 
-              icon={<Users2 size={20} />} 
-              label="2. Comunidade" 
-              onClick={() => handleNavigation('/comunidade')} 
-              active={pathname === '/comunidade'} 
+            <Option
+              icon={<Users2 size={20} />}
+              label={t('components.accessibility_card.nav_community')}
+              onClick={() => handleNavigation('/comunidade')}
+              active={pathname === '/comunidade'}
+              t={t}
             />
-            <Option 
-              icon={<Newspaper size={20} />} 
-              label="3. Notícias" 
-              onClick={() => handleNavigation('/noticias')} 
-              active={pathname === '/noticias'} 
+            <Option
+              icon={<Newspaper size={20} />}
+              label={t('components.accessibility_card.nav_news')}
+              onClick={() => handleNavigation('/noticias')}
+              active={pathname === '/noticias'}
+              t={t}
             />
-            <Option 
-              icon={<Brain size={20} />} 
-              label="4. O que é o TEA" 
-              onClick={() => handleNavigation('/TEA')} 
-              active={pathname === '/TEA'} 
+            <Option
+              icon={<Brain size={20} />}
+              label={t('components.accessibility_card.nav_tea')}
+              onClick={() => handleNavigation('/tea')}
+              active={pathname === '/tea'}
+              t={t}
             />
-            <Option 
-              icon={<FileText size={20} />} 
-              label="5. Termos de uso" 
-              onClick={() => handleNavigation('/termos')} 
-              active={pathname === '/termos'} 
+            <Option
+              icon={<FileText size={20} />}
+              label={t('components.accessibility_card.nav_terms')}
+              onClick={() => handleNavigation('/termos')}
+              active={pathname === '/termos'}
+              t={t}
             />
-            <Option 
-              icon={<ShieldCheck size={20} />} 
-              label="6. Privacidade" 
-              onClick={() => handleNavigation('/privacidade')} 
-              active={pathname === '/privacidade'} 
+            <Option
+              icon={<ShieldCheck size={20} />}
+              label={t('components.accessibility_card.nav_privacy')}
+              onClick={() => handleNavigation('/privacidade')}
+              active={pathname === '/privacidade'}
+              t={t}
             />
-            <Option 
-              icon={<Cookie size={20} />} 
-              label="7. Cookies" 
-              onClick={() => handleNavigation('/cookies')} 
-              active={pathname === '/cookies'} 
+            <Option
+              icon={<Cookie size={20} />}
+              label={t('components.accessibility_card.nav_cookies')}
+              onClick={() => handleNavigation('/cookies')}
+              active={pathname === '/cookies'}
+              t={t}
             />
-            <Option 
-              icon={<User2 size={20} />} 
-              label="8. Conta" 
-              onClick={() => handleNavigation('/account')} 
-              active={pathname === '/account'} 
+            <Option
+              icon={<User2 size={20} />}
+              label={t('components.accessibility_card.nav_account')}
+              onClick={() => handleNavigation('/account')}
+              active={pathname === '/account'}
+              t={t}
             />
           </div>
         </Section>
 
         {/* --- MODELOS PRONTOS --- */}
-        <Section title="Modelos prontos">
-          <Model label="Pessoa cega / Baixa Visão" onClick={() => aplicarModelo('cega')} />
-          <Model label="Pessoa TDAH" onClick={() => aplicarModelo('tdah')} />
-          <Model label="Pessoa Dislexa" onClick={() => aplicarModelo('dislexa')} />
-          <Model label="Pessoa com Alta idade" onClick={() => aplicarModelo('idade')} />
-          <Model label="Pessoa com Parkinson" />
+        <Section title={t('components.accessibility_card.section_models')}>
+          <Model label={t('components.accessibility_card.model_blind')} onClick={() => aplicarModelo('cega')} t={t} />
+          <Model label={t('components.accessibility_card.model_adhd')} onClick={() => aplicarModelo('tdah')} t={t} />
+          <Model label={t('components.accessibility_card.model_dyslexia')} onClick={() => aplicarModelo('dislexa')} t={t} />
+          <Model label={t('components.accessibility_card.model_elderly')} onClick={() => aplicarModelo('idade')} t={t} />
+          <Model label={t('components.accessibility_card.model_parkinson')} t={t} />
         </Section>
 
         <div className="w-full flex items-center justify-center py-1">
@@ -363,24 +381,34 @@ function ColorCard({ label, gradient, active, onClick }) {
   );
 }
 
-function Option({ icon, label, active, onClick }) {
+function Option({ icon, label, active, onClick, desktopOnly, t }) {
   // Se não houver onClick (ex: opções não finalizadas), ele se comporta como botão normal
   return (
     <button
       onClick={onClick}
-      className={`cursor-pointer rounded-lg p-2.5 flex text-center justify-center flex-col items-center gap-2 text-[10px] border transition-all min-h-[80px] ${
+      aria-disabled={desktopOnly ? true : undefined}
+      className={`relative overflow-hidden cursor-pointer rounded-lg p-2.5 flex text-center justify-center flex-col items-center gap-2 text-[10px] border transition-all min-h-[80px] ${
+        desktopOnly ? "pointer-events-none lg:pointer-events-auto" : ""
+      } ${
         active
           ? "bg-[#143A7B] text-white border-[#143A7B]"
           : "bg-white border-[#CFCFCF] text-[#1A3879] hover:bg-blue-50 hover:border-blue-400"
       }`}
     >
-      {icon}
-      <span className="leading-tight">{label}</span>
+      <div className={`flex flex-col items-center gap-2 ${desktopOnly ? "opacity-30 lg:opacity-100" : ""}`}>
+        {icon}
+        <span className="leading-tight">{label}</span>
+      </div>
+      {desktopOnly && (
+        <span className="lg:hidden absolute bottom-0 inset-x-0 bg-gray-700/90 text-white text-[8px] font-bold py-0.5 uppercase tracking-widest text-center">
+          {t('components.accessibility_card.desktop_only')}
+        </span>
+      )}
     </button>
   );
 }
 
-function Model({ label, onClick }) {
+function Model({ label, onClick, t }) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-[#EFEFEF] last:border-none">
       <div className="flex items-center gap-2">
@@ -389,11 +417,11 @@ function Model({ label, onClick }) {
       </div>
       
       {/* Alterei o Toggle switch antigo para um botão de "Aplicar" para facilitar a UX com o Contexto */}
-      <button 
-        onClick={onClick} 
+      <button
+        onClick={onClick}
         className="bg-[#143A7B] text-white text-[9px] px-3 py-1 rounded-full hover:bg-blue-800 transition-colors cursor-pointer"
       >
-        APLICAR
+        {t('components.accessibility_card.model_apply')}
       </button>
     </div>
   );

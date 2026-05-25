@@ -10,7 +10,6 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function CriarPost() {
   const [text, setText] = useState("");
-  const [section, setSection] = useState("comunidade");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -62,14 +61,14 @@ export default function CriarPost() {
       const res = await fetch(`${API}/api/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ text, section, postImageUrl }),
+        body: JSON.stringify({ text, section: "comunidade", postImageUrl }),
       });
 
       if (res.status === 401) throw new Error("Sessão expirada. Faça login novamente.");
       if (!res.ok) throw new Error("Erro ao publicar post. Tente novamente.");
 
       showToast("Post publicado com sucesso! 🎉", "success");
-      router.push(section === "forum" ? "/#comunidade" : "/comunidade");
+      router.push("/comunidade");
     } catch (err) {
       showToast(err.message, "error");
     } finally {
@@ -100,20 +99,7 @@ export default function CriarPost() {
             />
             <div>
               <p className="font-semibold dark:text-white">{user.name}</p>
-              <div className="flex gap-2 mt-1">
-                {["comunidade", "forum"].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setSection(s)}
-                    className={`text-xs px-3 py-1 rounded-full font-medium transition-all ${
-                      section === s ? "bg-[#1A3879] text-white" : "bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300"
-                    }`}
-                  >
-                    {s === "comunidade" ? "Comunidade" : "Fórum"}
-                  </button>
-                ))}
-              </div>
+              <span className="text-xs px-3 py-1 rounded-full font-medium bg-[#1A3879] text-white mt-1 inline-block">Comunidade</span>
             </div>
           </div>
 
