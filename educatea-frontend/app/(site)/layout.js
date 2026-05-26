@@ -1,6 +1,5 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 import { DM_Sans } from "next/font/google";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
@@ -25,46 +24,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
-      <body
-        className={`${dmSans.className} z-0 relative antialiased`}
-        suppressHydrationWarning
-      >
-        <UserProvider>
-          <LanguageProvider>
-            <AcessibilidadeProvider>
-              <ToastProvider>
-                <svg aria-hidden="true" focusable="false" style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}>
-                  <defs>
-                    <filter id="daltonismo-protanopia">
-                      <feColorMatrix type="matrix" values="
-                        1     0     0     0 0
-                        0     1     0     0 0
-                        0.4  -0.4   1     0 0
-                        0     0     0     1 0
-                      " />
-                    </filter>
-                    <filter id="daltonismo-deuteranopia">
-                      <feColorMatrix type="matrix" values="
-                        1     0     0     0 0
-                        0     1     0     0 0
-                       -0.4   0.4   1     0 0
-                        0     0     0     1 0
-                      " />
-                    </filter>
-                    <filter id="daltonismo-tritanopia">
-                      <feColorMatrix type="matrix" values="
-                        1     0     0.7   0 0
-                        0     1    -0.7   0 0
-                        0     0     1     0 0
-                        0     0     0     1 0
-                      " />
-                    </filter>
-                  </defs>
-                </svg>
+    <html lang="pt-BR">
+      <UserProvider>
+        <LanguageProvider>
+          <AcessibilidadeProvider>
+            <ToastProvider>
+              <body className={`${dmSans.className} z-0 relative antialiased`}>
                 <Header />
-                <ScrollToTop />
-                <div id="site-content" className="min-h-screen pt-[12dvh] lg:pt-[13dvh]">
+                <div id="site-content" className="min-h-screen pt-[13dvh]">
                   {children}
                 </div>
                 <div className="z-40 fixed right-5 bottom-10">
@@ -72,11 +39,11 @@ export default function RootLayout({ children }) {
                   <AcessibilidadeWidget />
                 </div>
                 <Footer />
-              </ToastProvider>
-            </AcessibilidadeProvider>
-          </LanguageProvider>
-        </UserProvider>
-      </body>
+              </body>
+            </ToastProvider>
+          </AcessibilidadeProvider>
+        </LanguageProvider>
+      </UserProvider>
     </html>
   );
 }

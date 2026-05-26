@@ -1,10 +1,38 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C \"c:\\\\Users\\\\USER\\\\educatea-v2-0\" ls-files educatea-backend/src/server.ts educatea-backend/vercel.json vercel.json)",
-      "Bash(git commit -m ' *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(mysql -u root -proot -e \"SELECT VERSION\\(\\);\")",
+      "Bash(where mysql *)",
+      "Bash(timeout 10 npx ts-node-dev --transpile-only src/index.ts)",
+      "Bash(node -e ' *)",
+      "Bash(npx ts-node-dev *)",
+      "Read(//tmp/**)",
+      "Bash(echo \"Backend PID: $!\")",
+      "Bash(npm run *)",
+      "Bash(echo \"Frontend PID: $!\")",
+      "Bash(curl -s http://localhost:3001/api/health)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(pkill -f \"ts-node-dev\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(pkill -f \"next\")",
+      "Bash(curl -s http://localhost:3001/api/comments/mine)",
+      "Bash(curl -s \"http://localhost:3001/api/comments?section=comunidade\")",
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"carlos@teste.com\",\"password\":\"senha123\"}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/comunidade)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/criar-post)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/meus-posts)",
+      "Bash(curl -s http://localhost:3001/api/comments?section=comunidade)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(git push *)",
+      "Bash(node -e \"process.stdin.resume\\(\\);let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);console.log\\(JSON.stringify\\(a.slice\\(0,2\\),null,2\\)\\)}\\)\")",
+      "Bash(curl *)",
+      "Bash(npx next *)",
+      "Bash(xargs grep *)",
       "Bash(git add *)",
-      "Bash(git push *)"
+      "Bash(git commit *)"
     ]
   }
 }

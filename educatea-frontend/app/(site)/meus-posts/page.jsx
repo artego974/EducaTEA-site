@@ -6,7 +6,6 @@ import { useUser } from "@/context/UserContext";
 import { useToast } from "@/context/ToastContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, X, Check, ImagePlus } from "lucide-react";
-import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -128,7 +127,6 @@ export default function MeusPosts() {
   const [loading, setLoading] = useState(true);
   const [editingPost, setEditingPost] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const { user, loading: authLoading, getToken } = useUser();
   const { showToast } = useToast();
@@ -152,6 +150,7 @@ export default function MeusPosts() {
   }, [user, authLoading, showToast, router, getToken]);
 
   const handleDelete = async (id) => {
+    if (!confirm("Tem certeza que deseja excluir este post?")) return;
     setDeletingId(id);
     try {
       const res = await fetch(`${API}/api/comments/${id}`, {
@@ -161,7 +160,7 @@ export default function MeusPosts() {
       if (res.status === 401) { showToast("Sessão expirada. Faça login novamente.", "error"); return; }
       if (!res.ok) throw new Error("Erro ao excluir.");
       setPosts((p) => p.filter((c) => c.id !== id));
-      showToast("Post excluído.", "error");
+      showToast("Post excluído.", "info");
     } catch {
       showToast("Não foi possível excluir o post.", "error");
     } finally {
@@ -235,7 +234,9 @@ export default function MeusPosts() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">Comunidade</span>
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${post.section === "comunidade" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                          {post.section === "comunidade" ? "Comunidade" : "Fórum"}
+                        </span>
                         <span className="text-[11px] text-gray-400">
                           {new Date(post.createdAt).toLocaleDateString("pt-BR")}
                         </span>
@@ -262,7 +263,7 @@ export default function MeusPosts() {
                         <Pencil size={16} />
                       </button>
                       <button
-                        onClick={() => setConfirmDeleteId(post.id)}
+                        onClick={() => handleDelete(post.id)}
                         disabled={deletingId === post.id}
                         className="p-2 rounded-xl bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-40 cursor-pointer"
                         title="Excluir"
@@ -289,15 +290,6 @@ export default function MeusPosts() {
           />
         )}
       </AnimatePresence>
-
-      <ConfirmModal
-        isOpen={!!confirmDeleteId}
-        title="Excluir post"
-        message="Tem certeza que deseja excluir este post? Esta ação não pode ser desfeita."
-        confirmLabel="Excluir"
-        onConfirm={() => { handleDelete(confirmDeleteId); setConfirmDeleteId(null); }}
-        onCancel={() => setConfirmDeleteId(null)}
-      />
     </div>
   );
 }

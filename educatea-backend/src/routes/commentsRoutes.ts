@@ -4,14 +4,14 @@ import {
   createComment, updateComment, deleteComment,
   toggleLike, myComments,
 } from "../controllers/commentsController";
-import { authMiddleware, optionalAuthMiddleware } from "../middleware/authMiddleware";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.get("/", optionalAuthMiddleware, listComments);
+router.get("/", listComments);
 router.get("/mine", authMiddleware, myComments);
-router.get("/:id", optionalAuthMiddleware, getComment);
-router.get("/:id/replies", optionalAuthMiddleware, getReplies);
+router.get("/:id", getComment);
+router.get("/:id/replies", getReplies);
 router.post("/", authMiddleware, createComment);
 router.put("/:id", authMiddleware, updateComment);
 router.delete("/:id", authMiddleware, deleteComment);

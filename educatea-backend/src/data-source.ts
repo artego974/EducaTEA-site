@@ -8,7 +8,6 @@ import { ChatbotMessage } from "./models/ChatbotMessage";
 import { ChatbotFeedback } from "./models/ChatbotFeedback";
 import { NewsArticle } from "./models/NewsArticle";
 import { AccessibilitySettings } from "./models/AccessibilitySettings";
-import { SavedPost } from "./models/SavedPost";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -17,8 +16,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER || "root",
   password: process.env.DB_PASS || "root",
   database: process.env.DB_NAME || "educatea",
-  timezone: "Z",
+  synchronize: process.env.NODE_ENV !== "production",
   logging: process.env.NODE_ENV === "development",
-  entities: [User, Comment, Like, ChatbotSession, ChatbotMessage, ChatbotFeedback, NewsArticle, AccessibilitySettings, SavedPost],
+  entities: [User, Comment, Like, ChatbotSession, ChatbotMessage, ChatbotFeedback, NewsArticle, AccessibilitySettings],
   migrations: [],
 });

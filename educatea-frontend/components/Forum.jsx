@@ -1,32 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { useUser } from "@/context/UserContext";
-import { useToast } from "@/context/ToastContext";
 import CommentCard from "./ForumComments";
-import PostDetailModal from "./PostDetailModal";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function Forum() {
+  const [isMobile, setIsMobile] = useState(false);
   const [comments, setComments] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null);
   const { t } = useLanguage();
-  const { user, getToken } = useUser();
-  const { showToast } = useToast();
 
   useEffect(() => {
-    fetch(`${API}/api/comments`, {
-      headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
-    })
+    fetch(`${API}/api/comments?section=forum`)
       .then((r) => r.json())
       .then((data) => setComments(Array.isArray(data) ? data : []))
       .catch(() => setComments([]));
   }, []);
 
-  const visibleComments = comments.slice(0, 8);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const handle = () => setIsMobile(mq.matches);
+    handle();
+    mq.addEventListener("change", handle);
+    return () => mq.removeEventListener("change", handle);
+  }, []);
+
+  const visibleComments = isMobile ? comments.slice(0, 3) : comments.slice(0, 8);
 
   const sectionVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -39,7 +40,6 @@ export default function Forum() {
   };
 
   return (
-    <>
     <motion.section
       id="comunidade"
       className="py-10 lg:py-15 flex flex-col items-center w-full dark:bg-zinc-800 dark:text-white"
@@ -76,7 +76,6 @@ export default function Forum() {
               <CommentCard
                 {...comment}
                 image={`/images/avatars/${comment.imageUrl || "avatar01.png"}`}
-                onClick={() => setSelectedPost(comment)}
               />
             </motion.div>
           ))}
@@ -108,18 +107,5 @@ export default function Forum() {
         />
       </motion.div>
     </motion.section>
-
-    <AnimatePresence>
-      {selectedPost && (
-        <PostDetailModal
-          comment={selectedPost}
-          onClose={() => setSelectedPost(null)}
-          currentUser={user}
-          getToken={getToken}
-          showToast={showToast}
-        />
-      )}
-    </AnimatePresence>
-    </>
   );
 }

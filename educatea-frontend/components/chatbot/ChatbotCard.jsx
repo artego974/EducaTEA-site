@@ -110,7 +110,7 @@ export default function ChatbotCard({ onClose, sessionId }) {
       animate="animate"
       exit="exit"
       transition={{ duration: 0.35, ease: "easeInOut" }}
-      className="z-50 w-[450px] max-w-[calc(100vw-3rem)] max-h-[72.5dvh] overflow-hidden rounded-2xl border bg-white dark:bg-zinc-600 dark:text-white shadow-xl p-5 pb-6 flex flex-col"
+      className="z-50 w-[400px] max-h-[70dvh] overflow-hidden rounded-2xl border bg-white dark:bg-zinc-600 dark:text-white shadow-xl p-5 pb-6 flex flex-col"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -136,7 +136,7 @@ export default function ChatbotCard({ onClose, sessionId }) {
         {messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-[85%] sm:max-w-[75%] px-4 py-2 rounded-xl text-sm leading-snug ${
+              className={`max-w-[75%] px-4 py-2 rounded-xl text-sm ${
                 msg.sender === "user"
                   ? "bg-[#1A3879] text-white rounded-br-none"
                   : "bg-gray-100 dark:bg-zinc-800 dark:text-white text-gray-800 rounded-bl-none"
@@ -174,25 +174,21 @@ export default function ChatbotCard({ onClose, sessionId }) {
         )}
 
         {currentFlow && !isTyping && (
-          <div className="mt-4 flex flex-col gap-2.5 sm:gap-3">
-            <span className="sm:hidden text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-300 px-1">
-              Sugestões
-            </span>
+          <div className="mt-4 flex flex-col gap-3">
             {Object.keys(CHAT_FLOW[currentFlow].followUps).map((text, index) => (
               <button
                 key={index}
                 disabled={isTyping}
                 onClick={() => handleFollowUp(text)}
-                className="group flex cursor-pointer items-center justify-between gap-2 rounded-2xl sm:rounded-full border border-gray-200 dark:border-zinc-500 px-4 py-3 sm:py-2 text-sm text-left sm:text-center hover:border-[#1A3879] hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
+                className="rounded-full cursor-pointer border px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
               >
-                <span className="flex-1 leading-snug">{text}</span>
-                <ArrowUpRight className="sm:hidden w-4 h-4 shrink-0 text-gray-400 group-hover:text-[#1A3879] transition" />
+                {text}
               </button>
             ))}
             <button
               onClick={handleReset}
               disabled={isTyping}
-              className="mt-1 sm:mt-0 flex cursor-pointer items-center justify-center gap-2 rounded-2xl sm:rounded-full border border-dashed border-gray-300 dark:border-zinc-400 px-4 py-2.5 sm:py-2 text-sm text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-dashed px-4 py-2 text-sm text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition"
             >
               <RotateCcw className="w-4 h-4" />
               Voltar ao menu inicial
